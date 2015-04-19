@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,12 +17,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+
+
+
+
+
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,9 +38,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -47,12 +56,26 @@ public class TrackerActivity extends Activity {
 	private Button showListButton;
 	String mValueResult = null;
 	private ProgressDialog pDialog;
-	private boolean proceed = false;
+	SharedPreferences mPreferences;
+	private static final String MyPREFERENCES = "trackIP";
+	private static String SYSTEM_IP;
+	private boolean mErrorInConnection = false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tracker);
 		mContext = this;
+		mPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+		if(!mPreferences.contains("mIsTableExist") && !mPreferences.getBoolean("mIsTableExist", false)) {
+			createTable();
+					
+		}
+		
+		if(mPreferences.contains("SystemIP")) {
+			SYSTEM_IP = mPreferences.getString("SystemIP", "");
+		}
+		else
+			showIpDialog();
 		mList = (ListView) findViewById(R.id.listView);
 		showListButton = (Button) findViewById(R.id.showListButton);
 		showListButton.setOnClickListener(showClick);
@@ -81,6 +104,42 @@ public class TrackerActivity extends Activity {
 	
 	private void showList() {
 		mList.setAdapter(mListAdapter);
+	}
+	
+	private void showIpDialog() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        alertDialogBuilder.setTitle("Enter Server IP");
+        final EditText input = new EditText(this);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(40, 80, 80, 40);
+
+        layout.addView(input, params);
+        alertDialogBuilder.setView(layout);
+        // set positive button: Yes message
+        alertDialogBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog,int id) {
+                   // go to a new activity of the app
+            	   String ip = input.getText().toString();
+                   Editor editor = mPreferences.edit();
+                   editor.putString("SystemIP", ip);
+                   editor.commit();
+                   SYSTEM_IP = ip;
+               }
+             });
+        // set negative button: No message
+        alertDialogBuilder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog,int id) {
+                   // cancel the alert box and put a Toast to the user
+                   dialog.cancel();
+                   
+               }
+           });
+        
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
 	}
 	
 	private List<Boy> getValues(String values) {
@@ -114,6 +173,24 @@ public class TrackerActivity extends Activity {
 		return tempValues;
 	}
 	
+	private List<Boy> loadDummyData() {
+		List<Boy> tempValues = new ArrayList<Boy>();
+		Boy mBoy1 = new Boy("Yogesh",28587546,77362555,15000);
+		Boy mBoy2 = new Boy("Lokesh",29000000,77362555,55000);
+		Boy mBoy3 = new Boy("Rocky", 28597500, 77362555, 30000);
+		Boy mBoy4 = new Boy("Ram", 28597600, 77362655, 20000);
+		Boy mBoy5 = new Boy("Shyam", 28597700, 77362455, 25000);
+		tempValues.add(mBoy1);
+		tempValues.add(mBoy2);
+		tempValues.add(mBoy3);
+		tempValues.add(mBoy4);
+		tempValues.add(mBoy5);
+		return tempValues;
+	}
+	
+	private void createTable() {
+		new CreateTableTask().execute();
+	}
 	
 	private OnClickListener showClick = new OnClickListener() {
 		
@@ -205,6 +282,33 @@ public class TrackerActivity extends Activity {
 
 
 	}
+	private void showDummyDataLoadDialog() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        alertDialogBuilder.setTitle("Error");
+        alertDialogBuilder.setMessage("Can not connect to server. Want to load dummy data?");
+        // set positive button: Yes message
+        alertDialogBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog,int id) {
+            
+            	showListButton.setVisibility(View.GONE);
+   			    mList.setVisibility(View.VISIBLE);
+   			    mValues = loadDummyData();
+   			    mListAdapter = new ListAdapter(mContext, mValues);
+   			    showList();
+               }
+             });
+        // set negative button: No message
+        alertDialogBuilder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog,int id) {
+                   // cancel the alert box and put a Toast to the user
+                   dialog.cancel();
+                   
+               }
+           });
+        
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+	}
 	
 	 class GetValue extends AsyncTask<Void, String, String> {
 
@@ -230,7 +334,7 @@ public class TrackerActivity extends Activity {
 			String qResult = "";
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpContext localContext = new BasicHttpContext();
-			HttpGet httpGet = new HttpGet("http://192.168.42.138/demo.php");
+			HttpGet httpGet = new HttpGet("http://"+SYSTEM_IP+"/demo.php");
 
 			try {
 			HttpResponse response = httpClient.execute(httpGet,
@@ -248,21 +352,14 @@ public class TrackerActivity extends Activity {
 			}
 			qResult = stringBuilder.toString();
 			}
-
+			mErrorInConnection = false;
 			} catch (ClientProtocolException e) {
 			e.printStackTrace();
 			
 			} catch (IOException e) {
 				final Exception e1 = e;
 			e.printStackTrace();
-			runOnUiThread(new Runnable() {
-				
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					Toast.makeText(mContext, e1.getMessage(), Toast.LENGTH_SHORT).show();
-				}
-			});
+			mErrorInConnection = true;
 			Log.v("yogesh", "Error: "+e.getMessage());
 			if(e.getMessage().contains("Unable to resolve host")) {
 				return null;
@@ -284,6 +381,86 @@ public class TrackerActivity extends Activity {
 				mValues = getValues(result);
 			    mListAdapter = new ListAdapter(mContext, mValues);
 			    showList();
+			}
+			if(pDialog !=null)
+				pDialog.dismiss();
+			if(mErrorInConnection)
+				showDummyDataLoadDialog();
+		}
+		 
+	 }
+	 
+	 class CreateTableTask extends AsyncTask<Void, String, String> {
+
+		 @Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			pDialog = new ProgressDialog(mContext);
+			pDialog.setTitle("Loading...");
+			pDialog.setMessage("Setting up server");
+				runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						pDialog.show();
+					}
+				});
+		}
+		@Override
+		protected String doInBackground(Void... arg0) {
+			// TODO Auto-generated method stub
+
+			// TODO Auto-generated method stub
+			String qResult = "";
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpContext localContext = new BasicHttpContext();
+			HttpGet httpGet = new HttpGet("http://"+SYSTEM_IP+"/create.php");
+
+			try {
+			HttpResponse response = httpClient.execute(httpGet,
+			localContext);
+			HttpEntity entity = response.getEntity();
+
+			if (entity != null) {
+			InputStream inputStream = entity.getContent();
+			Reader in = new InputStreamReader(inputStream);
+			BufferedReader bufferedreader = new BufferedReader(in);
+			StringBuilder stringBuilder = new StringBuilder();
+			String stringReadLine = null;
+			while ((stringReadLine = bufferedreader.readLine()) != null) {
+			stringBuilder.append(stringReadLine + "\n");
+			}
+			qResult = stringBuilder.toString();
+			
+			}
+			} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			
+			} catch (IOException e) {
+				final Exception e1 = e;
+			e.printStackTrace();
+			Log.v("yogesh", "Error: "+e.getMessage());
+			if(e.getMessage().contains("Unable to resolve host")) {
+				return null;
+			}
+			
+			}
+			
+			return qResult;
+		
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			Log.v("yogesh", "table create: "+result);
+			if(result.contains("Database created successfully")) {
+				Editor editor = mPreferences.edit();
+				editor.putBoolean("mIsTableExist", true);
+				editor.commit();
 			}
 			if(pDialog !=null)
 				pDialog.dismiss();

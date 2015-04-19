@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 public class TrackMe extends Activity {
 
@@ -25,6 +26,7 @@ public class TrackMe extends Activity {
 	private EditText mNameEdit;
 	private SharedPreferences sharedpreferences;
 	public static final String MyPREFERENCES = "Tracker";
+	public static String SYSTEM_IP;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +128,11 @@ public class TrackMe extends Activity {
 		                    mStopTrackingButton.setVisibility(View.VISIBLE);
 		                    mEnterButton.setVisibility(View.VISIBLE);
 		        			mExitButton.setVisibility(View.VISIBLE);
+		        			if(sharedpreferences.contains("SystemIP")) {
+		        				SYSTEM_IP = sharedpreferences.getString("SystemIP", "");
+		        			}
+		        			else
+		        				showIpDialog();
 		                }
 		              });
 		         // set negative button: No message
@@ -141,5 +148,40 @@ public class TrackMe extends Activity {
 		         alertDialog.show();
 
 
+	}
+	private void showIpDialog() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
+        alertDialogBuilder.setTitle("Enter Server IP");
+        final EditText input = new EditText(this);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(40, 80, 80, 40);
+
+        layout.addView(input, params);
+        alertDialogBuilder.setView(layout);
+        // set positive button: Yes message
+        alertDialogBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog,int id) {
+                   // go to a new activity of the app
+            	   String ip = input.getText().toString();
+                   Editor editor = sharedpreferences.edit();
+                   editor.putString("SystemIP", ip);
+                   editor.commit();
+                   SYSTEM_IP = ip;
+               }
+             });
+        // set negative button: No message
+        alertDialogBuilder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog,int id) {
+                   // cancel the alert box and put a Toast to the user
+                   dialog.cancel();
+                   
+               }
+           });
+        
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
 	}
 }
