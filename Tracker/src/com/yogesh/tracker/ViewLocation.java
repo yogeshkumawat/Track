@@ -227,7 +227,12 @@ public class ViewLocation extends Activity{
 	            
 	            // Drawing polyline in the Google Map for the i-th route
 	            Log.v("yogesh", "Route draw");
-	            googleMap.addPolyline(lineOptions);                            
+	            try {
+					googleMap.addPolyline(lineOptions);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}                            
 	        }            
 	    }   
 

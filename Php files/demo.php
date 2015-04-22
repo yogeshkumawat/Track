@@ -1,23 +1,18 @@
 <?php
-$username ='root';
-$password ='';
-$hostname ='localhost';
-$database ='tracker';
+$username ='u967317085_root';
+$password ='yogesh';
+$hostname ='mysql.hostinger.in';
+$database ='u967317085_track';
 
-$localhost = mysql_connect($hostname,$username,$password) or trigger_error(mysql_error(),E_USER_ERROR);
-mysql_select_db($database,$localhost);
-$i=mysql_query("select * from boy");
- 
-$num_rows = mysql_num_rows($i);
+$localhost = mysqli_connect($hostname, $username, $password, $database);
+if (!$localhost) {
+    die("Connection failed: " . mysqli_connect_error());
+} 
+$sql = "select * from boy";
+$result = mysqli_query($localhost, $sql);
 
-#print(json_encode($num_rows));
-#while($row = mysql_fetch_array($i))
-#{
-#$r[]=$row;
-#$check=$row['_id'];
-#}
-if($num_rows > 0) {
-while( $row = mysql_fetch_assoc( $i ) ){
+if(mysqli_num_rows($result) > 0) {
+while( $row = mysqli_fetch_assoc($result)){
 print(json_encode($row['name']));
 print(json_encode($row['latitude']));
 print(json_encode($row['longitude']));
@@ -25,5 +20,5 @@ print(json_encode($row['duration']));
 echo "\n";
 }
 }
-mysql_close($localhost);
+mysqli_close($localhost);
 ?>

@@ -1,24 +1,26 @@
 <?php
-$username ='root';
-$password ='';
-$hostname ='localhost';
-$database ='tracker';
+$username ='u967317085_root';
+$password ='yogesh';
+$hostname ='mysql.hostinger.in';
+$database ='u967317085_track';
 
-$localhost = mysql_connect($hostname,$username,$password) or trigger_error(mysql_error(),E_USER_ERROR);
-mysql_select_db($database,$localhost);
+
+$localhost = mysqli_connect($hostname,$username,$password,$database); if (!$localhost) {
+    die("Connection failed: " . mysqli_connect_error());
+} 
 	 
 	$name=$_REQUEST['name'];
 	$latitude=$_REQUEST['latitude'];
 	$longitude=$_REQUEST['longitude'];
-  $points=$_REQUEST['points'];
+       $points=$_REQUEST['points'];
 
 	$flag['code']=0;
 
-	if($r=mysql_query("UPDATE boy SET latitude='$latitude', longitude='$longitude', points = '$points' WHERE name ='$name'",$localhost))
+	if(mysqli_query($localhost, "UPDATE boy SET latitude='$latitude', longitude='$longitude', points = '$points' WHERE name ='$name'"))
 	{
 		$flag['code']=1;
 	}
 
 	print(json_encode($flag));
-	mysql_close($localhost);
+	mysqli_close($localhost);
 ?>

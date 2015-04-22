@@ -380,7 +380,7 @@ public class TrackService extends Service {
 			HttpContext localContext = new BasicHttpContext();
 
 			try {
-				HttpPost httppost = new HttpPost("http://"+TrackMe.SYSTEM_IP+"/insert.php");
+				HttpPost httppost = new HttpPost("http://www.nrsoni.16mb.com/insert.php");
 				HttpClient httpclient = new DefaultHttpClient();
 				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 				HttpResponse response = httpclient.execute(httppost);
@@ -448,7 +448,7 @@ public class TrackService extends Service {
 			HttpContext localContext = new BasicHttpContext();
 
 			try {
-				HttpPost httppost = new HttpPost("http://"+TrackMe.SYSTEM_IP+"/update.php");
+				HttpPost httppost = new HttpPost("http://www.nrsoni.16mb.com/update.php");
 				HttpClient httpclient = new DefaultHttpClient();
 				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 				HttpResponse response = httpclient.execute(httppost);
@@ -515,7 +515,7 @@ public class TrackService extends Service {
 				HttpContext localContext = new BasicHttpContext();
 
 				try {
-					HttpPost httppost = new HttpPost("http://"+TrackMe.SYSTEM_IP+"/update2.php");
+					HttpPost httppost = new HttpPost("http://www.nrsoni.16mb.com/update2.php");
 					HttpClient httpclient = new DefaultHttpClient();
 					httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 					HttpResponse response = httpclient.execute(httppost);

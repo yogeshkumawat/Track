@@ -66,16 +66,16 @@ public class TrackerActivity extends Activity {
 		setContentView(R.layout.activity_tracker);
 		mContext = this;
 		mPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-		if(!mPreferences.contains("mIsTableExist") && !mPreferences.getBoolean("mIsTableExist", false)) {
+		/*if(!mPreferences.contains("mIsTableExist") && !mPreferences.getBoolean("mIsTableExist", false)) {
 			createTable();
 					
-		}
+		}*/
 		
-		if(mPreferences.contains("SystemIP")) {
+		/*if(mPreferences.contains("SystemIP")) {
 			SYSTEM_IP = mPreferences.getString("SystemIP", "");
 		}
 		else
-			showIpDialog();
+			showIpDialog();*/
 		mList = (ListView) findViewById(R.id.listView);
 		showListButton = (Button) findViewById(R.id.showListButton);
 		showListButton.setOnClickListener(showClick);
@@ -189,7 +189,7 @@ public class TrackerActivity extends Activity {
 	}
 	
 	private void createTable() {
-		new CreateTableTask().execute();
+		//new CreateTableTask().execute();
 	}
 	
 	private OnClickListener showClick = new OnClickListener() {
@@ -253,7 +253,7 @@ public class TrackerActivity extends Activity {
 		        			Intent intent = new Intent(mContext, ViewLocation.class);
 		        			Boy mBoy = (Boy) arg1.getTag();
 		        			intent.putExtra("which", 1);
-		        			double latArray[] = {mBoy.mLatitude,mBoy.mLongitude,28580000,77360000};
+		        			double latArray[] = {mBoy.mLatitude,mBoy.mLongitude,28630000,77400000};
 		        			intent.putExtra("LocationArray", latArray);
 		        			startActivity(intent);
 		        		}
@@ -334,7 +334,7 @@ public class TrackerActivity extends Activity {
 			String qResult = "";
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpContext localContext = new BasicHttpContext();
-			HttpGet httpGet = new HttpGet("http://"+SYSTEM_IP+"/demo.php");
+			HttpGet httpGet = new HttpGet("http://www.nrsoni.16mb.com/demo.php");
 
 			try {
 			HttpResponse response = httpClient.execute(httpGet,
@@ -416,7 +416,7 @@ public class TrackerActivity extends Activity {
 			String qResult = "";
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpContext localContext = new BasicHttpContext();
-			HttpGet httpGet = new HttpGet("http://"+SYSTEM_IP+"/create.php");
+			HttpGet httpGet = new HttpGet("http://www.nrsoni.16mb.com/create.php");
 
 			try {
 			HttpResponse response = httpClient.execute(httpGet,

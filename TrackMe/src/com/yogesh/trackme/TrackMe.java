@@ -110,7 +110,7 @@ public class TrackMe extends Activity {
 	
 	private void showConfirmDialog() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
-		         alertDialogBuilder.setTitle(this.getTitle()+ " decision");
+		         alertDialogBuilder.setTitle("Your Name will set to: "+mNameEdit.getText().toString());
 		         alertDialogBuilder.setMessage("Are you sure?");
 		         // set positive button: Yes message
 		         alertDialogBuilder.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
@@ -128,11 +128,11 @@ public class TrackMe extends Activity {
 		                    mStopTrackingButton.setVisibility(View.VISIBLE);
 		                    mEnterButton.setVisibility(View.VISIBLE);
 		        			mExitButton.setVisibility(View.VISIBLE);
-		        			if(sharedpreferences.contains("SystemIP")) {
+		        			/*if(sharedpreferences.contains("SystemIP")) {
 		        				SYSTEM_IP = sharedpreferences.getString("SystemIP", "");
 		        			}
 		        			else
-		        				showIpDialog();
+		        				showIpDialog();*/
 		                }
 		              });
 		         // set negative button: No message

@@ -1,8 +1,8 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "tracker";
+$servername = "mysql.hostinger.in";
+$username = "u967317085_root";
+$password = "yogesh";
+$dbname = "u967317085_track";
 
 // Create connection
 $conn1 = new mysqli($servername, $username, $password);
@@ -12,7 +12,7 @@ if ($conn1->connect_error) {
 } 
 
 // Create database
-$sql = "CREATE DATABASE tracker";
+$sql = "CREATE DATABASE u967317085_track";
 if ($conn1->query($sql) === TRUE) {
     echo "Database created successfully";
 } else {
